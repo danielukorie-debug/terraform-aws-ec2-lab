@@ -1,0 +1,30 @@
+# Terraform working data and state
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+*.tfplan
+crash.log
+crash.*.log
+
+# Terraform override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Credentials and secrets
+.env
+.env.*
+*.pem
+*.key
+*.secret
+.terraformrc
+terraform.rc
+
+# Logs and temporary files
+*.log
+*.swp
+.DS_Store
+Thumbs.db
