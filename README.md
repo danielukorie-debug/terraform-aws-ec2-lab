@@ -96,3 +96,44 @@ resources the current state manages and intend to remove them.
 - Add Systems Manager access as an alternative to SSH
 - Add CloudWatch monitoring and alarms
 - Automate validation through a CI/CD pipeline
+
+## Architecture Diagram
+
+This diagram describes the infrastructure defined by this Terraform
+project. It does not establish that the resources have been deployed
+in AWS.
+
+```mermaid
+flowchart TD
+    Admin[Cloud administrator]
+    TF[Terraform configuration]
+    AWS[AWS provider - us-east-1]
+    VPC[Existing default VPC]
+    Subnet[Existing default subnet]
+    AMI[Ubuntu 24.04 LTS AMI]
+    SG[Security group - SSH restricted to approved CIDR]
+    EC2[EC2 instance - t3.micro by default]
+    EBS[Encrypted 8 GiB gp3 root volume]
+    IMDS[IMDSv2 required]
+    Outputs[Instance ID, public IP, SSH command]
+
+    Admin --> TF
+    TF --> AWS
+    AWS --> VPC
+    AWS --> AMI
+    VPC --> Subnet
+    Subnet --> EC2
+    AMI --> EC2
+    TF --> SG
+    SG --> EC2
+    EC2 --> EBS
+    EC2 --> IMDS
+    EC2 --> Outputs
+```
+
+## Validation Screenshot
+
+![EC2 Terraform validation](docs/images/ec2-terraform-validation.png)
+
+This screenshot records the Terraform formatting and validation
+results. Validation does not prove that AWS resources were deployed.
