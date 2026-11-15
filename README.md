@@ -84,7 +84,7 @@ This Terraform project has been deployed to AWS.
 | Root EBS volume | Encrypted 8 GiB gp3 |
 | Public IPv4 | None while stopped |
 | Terraform validation | Passed |
-| Latest normal plan | 0 to add, 1 to change, 0 to destroy |
+| Latest normal plan | 3 to add, 2 to change, 0 to destroy (SSM integration planned; not applied) |
 
 ### Infrastructure Protection
 
@@ -124,10 +124,44 @@ If resources are deployed, review the Terraform state and plan before
 destroying them. Run terraform destroy only when you understand which
 resources the current state manages and intend to remove them.
 
+## AWS Systems Manager — Planned Integration
+
+The Terraform configuration now includes a planned AWS Systems Manager
+(SSM) integration for the existing Ubuntu EC2 instance.
+
+### Terraform Components
+
+- `aws_iam_role.ec2_ssm`: IAM role trusted by the EC2 service.
+- `aws_iam_role_policy_attachment.ec2_ssm_core`: Attaches the
+  AWS-managed `AmazonSSMManagedInstanceCore` policy.
+- `aws_iam_instance_profile.ec2_ssm`: Makes the IAM role available
+  for attachment to the EC2 instance.
+- `aws_instance.lab`: References the planned IAM instance profile.
+
+### Validation and Deployment Status
+
+- Terraform configuration validation passed.
+- Latest verified plan: 3 to add, 2 to change, 0 to destroy.
+- The plan includes an EC2 instance-profile update and an SSH
+  security-group rule update.
+- No SSM-related Terraform changes have been applied to AWS.
+- The existing EC2 instance was last verified as stopped.
+- SSM Agent operation, outbound connectivity, and Session Manager
+  access have not yet been verified.
+
+### Security Objective
+
+Session Manager may provide administrative access without opening
+inbound SSH port 22, once the instance is correctly configured and
+connectivity is verified.
+
+The current SSH configuration remains restricted to an approved
+IPv4 /32 address. Do not expose SSH to `0.0.0.0/0`.
+
 ## Future Improvements
 
 - Add a dedicated VPC and subnet configuration
-- Add Systems Manager access as an alternative to SSH
+- Deploy and test the planned Systems Manager Session Manager access
 - Add CloudWatch monitoring and alarms
 - Automate validation through a CI/CD pipeline
 
@@ -164,6 +198,30 @@ flowchart TD
     EC2 --> IMDS
     EC2 --> Outputs
 ```
+
+### Planned AWS Systems Manager Architecture
+
+The following diagram shows the proposed SSM integration.
+These IAM resources are defined in Terraform but have not
+been deployed to AWS.
+
+```mermaid
+flowchart TD
+    EC2["Existing Ubuntu EC2 (stopped)"]
+    Profile["IAM instance profile (planned)"]
+    Role["IAM role (planned)"]
+    Policy["AmazonSSMManagedInstanceCore (planned attachment)"]
+    Agent["SSM Agent and connectivity (not verified)"]
+    Session["Session Manager (not tested)"]
+
+    EC2 -.-> Profile
+    Profile -.-> Role
+    Role -.-> Policy
+    EC2 -.-> Agent
+    Agent -.-> Session
+```
+
+Dashed arrows represent planned or unverified relationships, not confirmed operational connections.
 
 ## Validation Screenshot
 
