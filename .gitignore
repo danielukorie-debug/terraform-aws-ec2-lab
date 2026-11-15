@@ -28,3 +28,8 @@ terraform.rc
 *.swp
 .DS_Store
 Thumbs.db
+
+# Local Terraform configuration backups
+main.tf.backup
+main.tf.before-fix
+main.tf.before-public-ip-test
