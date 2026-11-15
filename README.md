@@ -171,3 +171,25 @@ flowchart TD
 
 This screenshot records the Terraform formatting and validation
 results. Validation does not prove that AWS resources were deployed.
+
+## Terraform Plan Evidence
+
+![Terraform EC2 plan](docs/images/ec2-terraform-plan.png)
+
+This screenshot records a normal Terraform plan reviewed on
+November 14, 2026.
+
+The plan showed:
+
+- **0 resources to add**
+- **1 security group to update in-place**
+- **0 resources to destroy**
+
+The proposed change updates the SSH access rule to the approved
+client IPv4 address.
+
+**Deployment status:** This security-group update has not been
+applied to AWS. The existing EC2 instance remains stopped.
+
+The plan also reflects the removal of the previous public IPv4
+address from Terraform outputs because the instance is stopped.
