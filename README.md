@@ -66,6 +66,40 @@ Example only—replace these placeholders with your own values:
 
 Review the plan before deciding whether to create any resources.
 
+## Deployment Status
+
+**Last verified: November 2026**
+
+This Terraform project has been deployed to AWS.
+
+| Component | Verified status |
+|---|---|
+| AWS Region | `us-east-1` |
+| EC2 instance | `i-00b425af9a114a029` |
+| Instance type | `t3.micro` |
+| Operating system | Ubuntu Server 24.04 LTS |
+| EC2 state | Stopped |
+| VPC and subnet | Existing default AWS resources |
+| Security group | Deployed; SSH rule update pending |
+| Root EBS volume | Encrypted 8 GiB gp3 |
+| Public IPv4 | None while stopped |
+| Terraform validation | Passed |
+| Latest normal plan | 0 to add, 1 to change, 0 to destroy |
+
+### Infrastructure Protection
+
+- `prevent_destroy = true` protects against accidental Terraform destruction.
+- The Ubuntu AMI is pinned to prevent automatic AMI replacement.
+- SSH is restricted to an approved IPv4 `/32` address.
+- IMDSv2 is required.
+- The EBS root volume is encrypted.
+
+The explicit public-IP association setting was removed after
+troubleshooting a replacement proposal while EC2 was stopped.
+
+**Important:** The latest Terraform plan proposes a security-group
+update that has not been applied. The EC2 instance remains stopped.
+
 ## Security Considerations
 
 - SSH is restricted to a specified IPv4 CIDR.
@@ -99,9 +133,9 @@ resources the current state manages and intend to remove them.
 
 ## Architecture Diagram
 
-This diagram describes the infrastructure defined by this Terraform
-project. It does not establish that the resources have been deployed
-in AWS.
+This diagram represents the Terraform-managed infrastructure deployed
+in AWS. The EC2 instance is currently stopped. The latest proposed
+SSH security-group update has not been applied.
 
 ```mermaid
 flowchart TD
