@@ -80,11 +80,11 @@ This Terraform project has been deployed to AWS.
 | Operating system | Ubuntu Server 24.04 LTS |
 | EC2 state | Stopped |
 | VPC and subnet | Existing default AWS resources |
-| Security group | Deployed; SSH rule update pending |
+| Security group | Deployed; SSH restricted to approved IPv4 /32 |
 | Root EBS volume | Encrypted 8 GiB gp3 |
 | Public IPv4 | None while stopped |
 | Terraform validation | Passed |
-| Latest normal plan | 3 to add, 2 to change, 0 to destroy (SSM integration planned; not applied) |
+| Latest normal plan | No changes; Terraform matches deployed AWS resources |
 
 ### Infrastructure Protection
 
@@ -97,8 +97,8 @@ This Terraform project has been deployed to AWS.
 The explicit public-IP association setting was removed after
 troubleshooting a replacement proposal while EC2 was stopped.
 
-**Important:** The latest Terraform plan proposes a security-group
-update that has not been applied. The EC2 instance remains stopped.
+**Important:** The SSM IAM integration and SSH security-group update have been applied.
+The latest Terraform plan reports no changes. EC2 remains stopped.
 
 ## Security Considerations
 
@@ -124,10 +124,10 @@ If resources are deployed, review the Terraform state and plan before
 destroying them. Run terraform destroy only when you understand which
 resources the current state manages and intend to remove them.
 
-## AWS Systems Manager — Planned Integration
+## AWS Systems Manager — Deployed IAM Integration
 
-The Terraform configuration now includes a planned AWS Systems Manager
-(SSM) integration for the existing Ubuntu EC2 instance.
+Terraform has deployed the AWS Systems Manager (SSM) IAM integration
+for the existing Ubuntu EC2 instance. Live SSM connectivity is not yet verified.
 
 ### Terraform Components
 
@@ -136,15 +136,14 @@ The Terraform configuration now includes a planned AWS Systems Manager
   AWS-managed `AmazonSSMManagedInstanceCore` policy.
 - `aws_iam_instance_profile.ec2_ssm`: Makes the IAM role available
   for attachment to the EC2 instance.
-- `aws_instance.lab`: References the planned IAM instance profile.
+- `aws_instance.lab`: References the deployed IAM instance profile.
 
 ### Validation and Deployment Status
 
 - Terraform configuration validation passed.
-- Latest verified plan: 3 to add, 2 to change, 0 to destroy.
-- The plan includes an EC2 instance-profile update and an SSH
-  security-group rule update.
-- No SSM-related Terraform changes have been applied to AWS.
+- Latest verified plan: No changes.
+- The EC2 instance profile and SSH security-group updates are deployed.
+- AWS CLI confirms the IAM instance profile and managed policy attachment.
 - The existing EC2 instance was last verified as stopped.
 - SSM Agent operation, outbound connectivity, and Session Manager
   access have not yet been verified.
@@ -161,7 +160,7 @@ IPv4 /32 address. Do not expose SSH to `0.0.0.0/0`.
 ## Future Improvements
 
 - Add a dedicated VPC and subnet configuration
-- Deploy and test the planned Systems Manager Session Manager access
+- Verify SSM Agent and test Session Manager access
 - Add CloudWatch monitoring and alarms
 - Automate validation through a CI/CD pipeline
 
@@ -199,29 +198,29 @@ flowchart TD
     EC2 --> Outputs
 ```
 
-### Planned AWS Systems Manager Architecture
+### Deployed AWS Systems Manager IAM Architecture
 
-The following diagram shows the proposed SSM integration.
-These IAM resources are defined in Terraform but have not
-been deployed to AWS.
+The following diagram shows the deployed IAM integration.
+SSM Agent operation and Session Manager connectivity remain unverified.
 
 ```mermaid
 flowchart TD
     EC2["Existing Ubuntu EC2 (stopped)"]
-    Profile["IAM instance profile (planned)"]
-    Role["IAM role (planned)"]
-    Policy["AmazonSSMManagedInstanceCore (planned attachment)"]
+    Profile["IAM instance profile (deployed)"]
+    Role["IAM role (deployed)"]
+    Policy["AmazonSSMManagedInstanceCore (attached)"]
     Agent["SSM Agent and connectivity (not verified)"]
     Session["Session Manager (not tested)"]
 
-    EC2 -.-> Profile
-    Profile -.-> Role
-    Role -.-> Policy
+    EC2 --> Profile
+    Profile --> Role
+    Role --> Policy
     EC2 -.-> Agent
     Agent -.-> Session
 ```
 
-Dashed arrows represent planned or unverified relationships, not confirmed operational connections.
+Solid arrows represent verified IAM configuration relationships.
+Dashed arrows represent unverified SSM Agent and Session Manager connectivity.
 
 ## Validation Screenshot
 
@@ -251,3 +250,15 @@ applied to AWS. The existing EC2 instance remains stopped.
 
 The plan also reflects the removal of the previous public IPv4
 address from Terraform outputs because the instance is stopped.
+## SSM IAM Deployment Verification
+
+![Terraform SSM deployment verification](docs/images/ssm-terraform-deployment-verified.png)
+
+The latest Terraform plan reported no changes, confirming
+that the deployed AWS resources match the Terraform configuration.
+
+AWS CLI verification confirmed the EC2 IAM instance profile
+and the AmazonSSMManagedInstanceCore policy attachment.
+
+The EC2 instance remained stopped. SSM Agent operation and
+Session Manager connectivity have not yet been tested.
