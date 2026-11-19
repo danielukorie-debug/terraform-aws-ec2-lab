@@ -71,3 +71,27 @@ Source: AWS CLI describe-volumes and
 describe-snapshots commands.
 
 No AWS resources were changed during this assessment.
+## EC2 Termination Protection Assessment
+
+### Verified AWS CLI Finding
+- EC2 instance: i-00b425af9a114a029
+- AWS Region: us-east-1
+- DisableApiTermination: false
+- API termination protection: disabled
+- Root EBS DeleteOnTermination: true
+
+### Risk
+The EC2 instance currently lacks API termination
+protection. Its root EBS volume is configured for
+deletion if the instance is terminated.
+
+### Recommended Improvement — NOT DEPLOYED
+Review enabling EC2 API termination protection.
+
+This setting must be coordinated with Terraform
+configuration to avoid configuration drift.
+
+### Validation
+Verified using AWS CLI describe-instance-attribute.
+
+No AWS resources were changed.
