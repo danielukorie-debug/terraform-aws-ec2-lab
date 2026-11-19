@@ -23,3 +23,15 @@ flowchart TD
     B --> C[Encrypted EBS Volume]
     C -. Planned Backup .-> D[EBS Snapshot]
 ```
+## GitHub Portfolio Evidence
+
+The following screenshot documents Git validation
+for this Terraform EC2 and EBS project.
+
+![Git validation screenshot](screenshots/ebs-git-validation.png)
+
+### Validation Status
+- Git commit: Verified
+- GitHub push: Verified
+- Screenshot: Captured locally
+- EBS snapshot: Planned, not deployed
