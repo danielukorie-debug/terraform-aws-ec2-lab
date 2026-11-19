@@ -85,6 +85,9 @@ resource "aws_instance" "lab" {
   lifecycle {
     prevent_destroy = true
   }
+
+  disable_api_termination = true
+
   ami                    = "ami-0d6dd9e8265d48906"
   instance_type          = var.instance_type
   subnet_id              = tolist(data.aws_subnets.default.ids)[0]
